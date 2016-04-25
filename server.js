@@ -34,6 +34,10 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
+
+
+
+
 app.get('/delphidata', function (req, res) {
   // TODO
   // Connect to the DELPHI Database and return the proper information
@@ -43,7 +47,24 @@ app.get('/delphidata', function (req, res) {
   // for each gender. 
   // Display that data using D3 with gender on the x-axis and 
   // total respondents on the y-axis.
-  return { delphidata: "No data present." }
+  var client = new pg.Client(conString);
+  client.connect(function(err) {
+    if(err) {
+      return console.error('could not connect to postgres', err);
+    }
+    client.query('SELECT gender, number_of_respondents FROM cogs121_16_raw.cdph_smoking_prevalence_in_adults_1984_2013 where year = 2003;',
+     function(err, result) {
+      if(err) {
+        return console.error('error running query', err);
+      }
+      var data = result.rows;
+      console.log (data);
+      client.end();
+      res.json(data);
+    });
+  });
+
+  //return { delphidata: "No data present." }
 });
 
 
